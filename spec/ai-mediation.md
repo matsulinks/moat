@@ -142,7 +142,7 @@ ai_mediation:
     model: "gpt-4o"
     api_key: "{{ INFISICAL_OPENAI_API_KEY }}"
   anonymize: true             # 送信前に個人情報を除去（常にtrue推奨）
-  require_approval: true      # ユーザー承認なしに自動送信しない
+  approval_level: high_risk_only  # none / high_risk_only / all
   notification:
     telegram: true
 ```

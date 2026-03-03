@@ -214,7 +214,7 @@ threat_intelligence:
     provider: "openai"
     model: "gpt-4o"
     api_key: "{{ INFISICAL_OPENAI_API_KEY }}"
-  require_approval: true         # 常にtrue推奨
+  approval_level: high_risk_only  # none / high_risk_only / all
   auto_apply_max_risk: "LOW"     # LOWリスクのみ自動適用（要承認設定時は無視）
   notification:
     telegram: true
