@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""OpenClaw Security Setup Wizard (single-file, stdlib only)."""
+"""Moat — AI Security for self-hosted agents (single-file, stdlib only)."""
 
 from __future__ import annotations
 
@@ -26,14 +26,14 @@ from pathlib import Path
 from typing import Any
 
 VERSION = "0.1.0"
-DEFAULT_RELEASES_API = "https://api.github.com/repos/matsulinks/AI-Security-System-spec/releases/latest"
-DEFAULT_RULES_URL = "https://raw.githubusercontent.com/matsulinks/AI-Security-System-spec/main/community-rules.json"
-DEFAULT_RULES_SHA_URL = "https://raw.githubusercontent.com/matsulinks/AI-Security-System-spec/main/community-rules.json.sha256"
-DEFAULT_REPORT_ISSUE_URL = "https://github.com/matsulinks/AI-Security-System-spec/issues/new"
-RELEASES_API = os.environ.get("OPENCLAW_RELEASES_API", DEFAULT_RELEASES_API)
-RULES_URL = os.environ.get("OPENCLAW_RULES_URL", DEFAULT_RULES_URL)
-RULES_SHA_URL = os.environ.get("OPENCLAW_RULES_SHA_URL", DEFAULT_RULES_SHA_URL)
-REPORT_ISSUE_URL = os.environ.get("OPENCLAW_REPORT_ISSUE_URL", DEFAULT_REPORT_ISSUE_URL)
+DEFAULT_RELEASES_API = "https://api.github.com/repos/matsulinks/moat/releases/latest"
+DEFAULT_RULES_URL = "https://raw.githubusercontent.com/matsulinks/moat/main/community-rules.json"
+DEFAULT_RULES_SHA_URL = "https://raw.githubusercontent.com/matsulinks/moat/main/community-rules.json.sha256"
+DEFAULT_REPORT_ISSUE_URL = "https://github.com/matsulinks/moat/issues/new"
+RELEASES_API = os.environ.get("MOAT_RELEASES_API", DEFAULT_RELEASES_API)
+RULES_URL = os.environ.get("MOAT_RULES_URL", DEFAULT_RULES_URL)
+RULES_SHA_URL = os.environ.get("MOAT_RULES_SHA_URL", DEFAULT_RULES_SHA_URL)
+REPORT_ISSUE_URL = os.environ.get("MOAT_REPORT_ISSUE_URL", DEFAULT_REPORT_ISSUE_URL)
 OUTPUT_DIR = Path("output")
 
 COLOR_RESET = "\033[0m"
@@ -250,7 +250,7 @@ LAYER3_CONFIG = textwrap.dedent(
     # === Layer 3: 認証・アクセス制御 ===
     auth:
       mode: token
-      token: "{{ INFISICAL_TOKEN_OPENCLAW_AUTH }}"
+      token: "{{ INFISICAL_TOKEN_MOAT_AUTH }}"
       requireMention: true
       pairing:
         allowlist:
@@ -376,7 +376,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenClaw Security Setup</title>
+  <title>Moat — AI Security</title>
   <style>
     /* ── Design tokens ─────────────────────────────────────── */
     :root {
@@ -855,8 +855,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <header class="site-header">
   <div class="logo-mark" aria-hidden="true">🦞</div>
   <div>
-    <h1>OpenClaw Security Setup</h1>
-    <p>AIエージェントのセキュリティ設定を自動生成します</p>
+    <h1>Moat</h1>
+    <p>AI Security for self-hosted agents</p>
   </div>
 </header>
 
@@ -930,10 +930,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 </div><!-- /.page -->
 <footer class="site-footer">
-  <a href="https://github.com/matsulinks/AI-Security-System-spec" target="_blank" rel="noopener">
-    ⭐ GitHub: AI-Security-System-spec
+  <a href="https://github.com/matsulinks/moat" target="_blank" rel="noopener">
+    ⭐ GitHub: matsulinks/moat
   </a>
-  &nbsp;·&nbsp; OpenClaw Security Setup v0.1
+  &nbsp;·&nbsp; Moat v0.1.0
 </footer>
 </div><!-- /#screen-main -->
 
@@ -963,8 +963,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 </div><!-- /.page -->
 <footer class="site-footer">
-  <a href="https://github.com/matsulinks/AI-Security-System-spec" target="_blank" rel="noopener">
-    ⭐ GitHub: AI-Security-System-spec
+  <a href="https://github.com/matsulinks/moat" target="_blank" rel="noopener">
+    ⭐ GitHub: matsulinks/moat
   </a>
 </footer>
 </div><!-- /#screen-complete -->
@@ -1817,7 +1817,7 @@ def build_setup_guide(selected_layers: set[str], env: dict[str, Any], approval_l
     selected = ", ".join(sorted(selected_layers)) if selected_layers else "なし"
     os_type = env.get("os_type", "unknown")
     parts = [
-        "# OpenClaw Security Setup Guide",
+        "# Moat — AI Security Setup Guide",
         "",
         f"生成日時: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"OS: {env.get('os', '不明')} ({os_type})",
@@ -1963,7 +1963,7 @@ def self_update() -> None:
     except Exception as exc:
         print(f"更新情報の取得に失敗しました: {exc}")
         print(f"参照URL: {RELEASES_API}")
-        print("必要なら環境変数 OPENCLAW_RELEASES_API でURLを変更してください。")
+        print("必要なら環境変数 MOAT_RELEASES_API でURLを変更してください。")
         return
 
     latest_tag = str(rel.get("tag_name", "")).strip()
@@ -2046,7 +2046,7 @@ def update_rules() -> None:
         print(f"ルール取得に失敗しました: {exc}")
         print(f"ルールURL: {RULES_URL}")
         print(f"SHA URL  : {RULES_SHA_URL}")
-        print("必要なら OPENCLAW_RULES_URL / OPENCLAW_RULES_SHA_URL で変更してください。")
+        print("必要なら MOAT_RULES_URL / MOAT_RULES_SHA_URL で変更してください。")
         return
 
     expected = _parse_sha256_line(sha_text)
@@ -2331,7 +2331,7 @@ def run_web_mode(port: int = 8765, no_browser: bool = False) -> None:
     print(f"ブラウザモードを起動しました: {url}")
     print("終了するには Ctrl+C を押してください。")
     # サービス起動（非対話）ではブラウザ自動起動をスキップする。
-    if no_browser or os.environ.get("OPENCLAW_NO_BROWSER") == "1" or not sys.stdout.isatty():
+    if no_browser or os.environ.get("MOAT_NO_BROWSER") == "1" or not sys.stdout.isatty():
         pass
     else:
         webbrowser.open(url)
@@ -2387,7 +2387,7 @@ def print_next_steps(selected_layers: list[str], env: dict[str, Any]) -> None:
 
 
 def run_terminal_mode() -> None:
-    print("=== OpenClaw Security Setup Wizard ===")
+    print("=== Moat — AI Security for self-hosted agents ===")
     print(f"Version: {VERSION}")
     print("\n[環境を自動検出中...]")
     env = detect_env()
@@ -2413,7 +2413,7 @@ def run_terminal_mode() -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="OpenClaw Security Setup Wizard")
+    parser = argparse.ArgumentParser(description="Moat — AI Security for self-hosted agents")
     parser.add_argument("--web", action="store_true", help="ブラウザモード (localhost:8765)")
     parser.add_argument("--no-browser", action="store_true", help="ブラウザを自動で開かない")
     parser.add_argument("--update", action="store_true", help="setup.py を最新に更新")
