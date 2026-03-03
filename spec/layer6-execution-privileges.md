@@ -54,11 +54,19 @@ tools:
     approvalTimeout: 30s
 
   network:
+    # Layer 5（スキル管理）・Layer 7（監視）との整合を保つため、
+    # 以下のドメインをホワイトリストに含める。
+    # 不要なドメインは運用環境に合わせて削除すること。
     allowed_domains:
-      - "api.openai.com"
-      - "api.infisical.com"
+      - "api.openai.com"          # LLM API
+      - "api.anthropic.com"       # LLM API（Anthropic使用時）
+      - "api.infisical.com"       # secrets取得（Layer 4）
+      - "github.com"              # スキルリポジトリ取得（Layer 5）
+      - "raw.githubusercontent.com" # スキルファイル取得（Layer 5）
+      - "www.virustotal.com"      # スキル導入前スキャン（Layer 5）
     allowed_ports:
-      - 443   # 原則443のみ。80は例外申請制（HTTPS強制原則）
+      - 443   # HTTPS（原則）
+      - 53    # DNS（名前解決。Layer 7 Falco監視でも必要）
 
   workspaceAccess: "ro"
 ```

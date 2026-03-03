@@ -17,8 +17,10 @@ OpenClawのスキル導入経路とプロンプト入力を厳格に防御し、
 2. **自前Gitリポジトリ運用**
    - private Git（GitHub/GitLab self-hosted推奨）
    - 人間レビュー後コミット、version pinning必須
+   - ※ GitHub へのアクセスは Layer 6 のネットワークホワイトリストに含めること
 3. **導入前多段階検証**
    - VirusTotalスキャン（API or CLI）→ 検出0件
+   - ※ www.virustotal.com へのアクセスは Layer 6 のネットワークホワイトリストに含めること
    - `openclaw skill audit --deep`
    - 静的解析: `grep -r "eval|exec|curl|rm -rf" <skill_dir>`
    - ステージングテスト（Dockerテスト環境）

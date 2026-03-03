@@ -4,7 +4,7 @@
 - sandbox.mode: "all" を強制し、プロセスを最大限隔離
 - non-rootユーザー実行 + 権限制限（read-only FS中心）
 - 高リスクcapabilitiesをすべてdrop
-- ネットワークをlocalhost/Tailscale限定に制限
+- ネットワークをカスタムbridgeネットワークに限定（host networkingは使用しない）
 - secretsは外部注入（Infisical JIT or YubiKey復号後mount）を前提
 
 **前提条件**
@@ -29,10 +29,7 @@ services:
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        exec infisical run \
-          --projectId YOUR_PROJECT_ID \
-          --env=prod \
-          -- /app/openclaw --config /app/config/config.yaml
+        exec infisical run           --projectId YOUR_PROJECT_ID           --env=prod           -- /app/openclaw --config /app/config/config.yaml
 
     # === セキュリティ: 隔離強化 ===
     user: "10000:10000"
@@ -44,13 +41,22 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
+    # cap_add は原則使用しない。
+    # OpenClawがCHOWN/SETUID/SETGIDを必要とする場合は、その必要性を確認した上で
+    # 個別に追加すること。不明な場合は追加しない（最小権限の原則を優先）。
 
-    # === ネットワーク: Tailscale経由localhostのみ ===
-    network_mode: "host"
+    # === ネットワーク: カスタムbridgeに限定 ===
+    # network_mode: host は使用しない（コンテナ境界を弱めるため）
+    # Tailscaleはホスト側で動作し、iptablesで通信制御する（Layer 1参照）
+    networks:
+      - openclaw-net
+
+    # === リソース制限（DoS対策） ===
+    # deploy.resources は docker stack deploy (Swarm) でのみ有効なため使用しない
+    # 通常の docker compose では mem_limit / cpus を直接指定する
+    mem_limit: 2g
+    memswap_limit: 2g
+    cpus: '1.0'
 
     # === ボリューム: read-only中心 ===
     volumes:
@@ -71,22 +77,36 @@ services:
       timeout: 10s
       retries: 3
 
-    # === リソース制限（DoS対策） ===
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 2G
-        reservations:
-          cpus: '0.5'
-          memory: 1G
-
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
+
+networks:
+  openclaw-net:
+    driver: bridge
+    internal: false   # アウトバウンドはiptablesで制御（Layer 1参照）
 ```
+
+## network_mode: host を使わない理由
+
+| 比較 | host networking | bridge networking（本仕様） |
+|---|---|---|
+| コンテナ境界 | ホストと共有（弱い） | 独立したネットワーク空間 |
+| ポート公開 | ホストの全ポートが露出 | 明示的にexposeしたポートのみ |
+| Tailscale連携 | 直接利用可能 | ホスト側Tailscale + iptablesで代替 |
+| セキュリティ | 隔離が弱まる | cap_drop ALL と一貫した設計 |
+
+Tailscaleはホスト側で動作させ、コンテナへのアクセスはiptablesルール（Layer 1参照）で制御する。
+
+## cap_add についての注意
+
+`cap_drop: ALL` の後に `cap_add` でCHOWN/SETUID/SETGIDを戻すことは最小権限の原則に反する。
+
+- **まずcap_addなしで起動を試みる**
+- 起動エラーが出た場合のみ、必要なcapabilityを個別に追加する
+- 追加する場合はコメントに理由を明記する
 
 ## 使い方
 
@@ -109,4 +129,4 @@ docker compose up -d
 - `container_name` はインスタンス毎にユニーク（instance01, instance02...）
 - `user: "10000:10000"` はホストのUID/GIDに合わせる
 - OPENCLAW_AUTH_TOKEN等の秘密はInfisicalからJIT注入（.envには絶対書かない）
-- `network_mode: "host"` はTailscale経由localhostアクセス前提
+- アウトバウンド通信制御はホスト側iptablesで行う（Layer 1参照）
