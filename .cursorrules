@@ -1,0 +1,42 @@
+# OpenClaw Security-System — 実装コーディング規約
+
+## 基本方針
+- 専用機原則: OpenClawインスタンスは専用ミニPCのみで動作させること
+- Fail-closed: 疑わしい場合は必ずブロック。deny-first設計を徹底
+- 秘密管理: 平文のtokenや鍵をコードにハードコードしない
+- 人間承認: 高リスク操作は必ずTelegramボタン承認を経由する
+
+## Docker
+- sandbox.mode は必ず "all" に設定すること
+- read_only: true を全コンテナに適用
+- cap_drop: [ALL] を全コンテナに適用（cap_addは最小限のみ）
+- user: "10000:10000" を指定（rootコンテナ禁止）
+- network_mode: "host" または公開ポートなし（外部露出禁止）
+
+## Secrets管理
+- 環境変数への平文記述禁止（OPENCLAW_TOKEN等をdocker-compose.ymlに直書きしない）
+- Infisical JIT注入を使用すること（entrypoint経由）
+- .env ファイルは chmod 600 で保護し、INFISICAL_SERVICE_TOKEN のみ記載
+
+## config.yaml
+- tools.deny に exec, runtime, automation, browser, fs:write を必ず含める
+- network.allowed_ports は 443 のみ（80は例外申請制）
+- prompt.guard.enabled: true を維持
+- requireMention: true をグループチャットで維持
+
+## Falco
+- カスタムルールは /etc/falco/falco_rules.local.yaml で管理
+- ルール変更後は必ず falco-event-generator でテストを実施
+- 誤検知チューニングの根拠をコメントで残すこと
+
+## Git/バージョン管理
+- スキル追加はprivate Gitリポジトリへの人間レビュー後コミットのみ
+- version pinning（commit hash or tag）を必ず指定
+- config.yaml の変更はGitでバージョン管理
+
+## 禁止事項
+- ClawHubからの直接スキルインストール
+- メインPC/仕事PCへのOpenClawインストール
+- インスタンス間での認証Token共有
+- 公開ポートの外部露出
+- sudo や rootでのDocker実行
