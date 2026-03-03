@@ -10,6 +10,8 @@
 - デフォルトdeny + ゼロトラスト
 - 人間インザループ（高リスク操作は承認必須）
 - Fail-closed設計（疑わしいものは通さない）
+- AIネイティブ設計（検知・分析・交渉・自己更新をAIが担う）
+- 外部通信は承認済みホワイトリストのみ（AI通信含む）
 
 ## 2. 全7層構成図
 
@@ -48,13 +50,15 @@
 
 | Layer | 名称 | 主要技術 | 役割 |
 |-------|------|---------|------|
-| 1 | ネットワーク分離 | Tailscale + default-deny ACL + tag制御 | 外部露出ゼロ、インスタンス間横移動阻止 |
-| 2 | コンテナ/サンドボックス | Docker sandbox:all + non-root + read_only + cap_drop ALL | プロセス脱獄・権限昇格防止 |
+| 1 | ネットワーク分離 | Tailscale + default-deny ACL + iptables | 外部露出ゼロ、インスタンス間横移動阻止、C2通信遮断 |
+| 2 | コンテナ/サンドボックス | Docker bridge network + non-root + read_only + cap_drop ALL | プロセス脱獄・権限昇格防止 |
 | 3 | 認証・アクセス制御 | 独立Token + pairing allowlist + requireMention | 不正命令の入口遮断 |
 | 4 | 機密情報管理 | Infisical JIT注入 + YubiKeyオプション + 定期ローテーション | 平文残存防止、芋づる漏洩阻止 |
 | 5 | スキル・プロンプト防御 | ClawHub禁止 + 自前Git + PromptGuard + LLM-as-Judge + 緊急遮断 | サプライチェーン攻撃・prompt injection阻止 |
-| 6 | 実行時最小権限 | default deny + elevated承認必須 + network 443のみ | たとえ突破されても被害を極限まで制限 |
+| 6 | 実行時最小権限 | default deny + elevated承認必須 + network ホワイトリスト | たとえ突破されても被害を極限まで制限 |
 | 7 | 監視・インシデント対応 | Falco + Prometheus + Grafana + Telegramアラート | 異常の早期発見・通知・被害限定 |
+| + | AI仲裁エージェント | OpenAI API + GitHub API | 新ソフトとの衝突検知・開発AI への報告・交渉 |
+| + | 脅威インテリジェンス | CVE/Falcoフィード + AI分析 + ワクチン生成 | 外部脅威情報の取得・防御ルール自動更新 |
 
 ## 4. 典型的な実行フロー
 
