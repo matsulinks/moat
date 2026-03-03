@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moat — Security for self-hosted AI agents</title>
+  <meta name="description" content="Moat detects your environment and generates hardened security configs for your self-hosted AI agents. No YAML expertise needed. Works with OpenClaw, LangChain, AutoGen, and more.">
+  <meta property="og:title" content="Moat — Security for self-hosted AI agents">
+  <meta property="og:description" content="One command. Seven security layers. Zero YAML expertise needed.">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --surface: #141928;
+      --surface2: #1e2537;
+      --border: #2a3450;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --accent: #38bdf8;
+      --accent2: #6ee7b7;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --success: #34d399;
+      --radius: 12px;
+      --radius-sm: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", sans-serif;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 15, 26, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-cta {
+      background: var(--accent);
+      color: #0b0f1a !important;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+    }
+    .nav-cta:hover { opacity: 0.9; text-decoration: none !important; }
+
+    /* ── Sections ── */
+    section { padding: 80px 24px; max-width: 960px; margin: 0 auto; }
+    section.full { max-width: 100%; padding: 80px 0; }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      padding-top: 100px;
+      padding-bottom: 80px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      letter-spacing: -1.5px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 2.5vw, 20px);
+      color: var(--muted);
+      max-width: 560px;
+      margin: 0 auto 40px;
+      line-height: 1.55;
+    }
+    .hero-sub strong { color: var(--text); }
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 48px;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #0b0f1a;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 12px 28px;
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; text-decoration: none; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 12px 28px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: border-color 0.15s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* ── Terminal demo ── */
+    .terminal {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: left;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+    .terminal-bar {
+      background: var(--surface2);
+      padding: 10px 16px;
+      display: flex;
+      gap: 7px;
+      align-items: center;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+    .terminal-title { font-size: 12px; color: var(--muted); margin-left: auto; margin-right: auto; }
+    .terminal-body {
+      padding: 20px 24px;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+    .t-prompt { color: var(--accent2); }
+    .t-cmd { color: var(--text); }
+    .t-comment { color: var(--muted); }
+    .t-ok { color: var(--success); }
+    .t-warn { color: var(--warn); }
+    .t-info { color: var(--accent); }
+    .t-dim { color: #4a5568; }
+
+    /* ── Stat bar ── */
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 48px;
+      flex-wrap: wrap;
+      padding: 48px 24px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: var(--accent);
+      display: block;
+    }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+    /* ── Problem section ── */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .problem-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .problem-card .icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    .problem-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .problem-card p { font-size: 14px; color: var(--muted); line-height: 1.55; }
+
+    /* ── Section title ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+    h2.section-title {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    /* ── Layers ── */
+    .layer-list { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
+    .layer-row {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: 48px 1fr auto;
+      gap: 16px;
+      align-items: center;
+      transition: border-color 0.15s;
+    }
+    .layer-row:hover { border-color: rgba(56, 189, 248, 0.4); }
+    .layer-num {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: "SF Mono", monospace;
+    }
+    .layer-info h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .layer-info p { font-size: 13px; color: var(--muted); }
+    .layer-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .badge-rec { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+    .badge-opt { background: rgba(251, 191, 36, 0.15); color: var(--warn); }
+
+    /* ── How it works ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 24px;
+      position: relative;
+    }
+    .step-num {
+      font-size: 48px;
+      font-weight: 900;
+      color: rgba(56, 189, 248, 0.12);
+      font-family: "SF Mono", monospace;
+      position: absolute;
+      top: 12px;
+      right: 20px;
+      line-height: 1;
+    }
+    .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+    /* ── Comparison ── */
+    .compare-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-top: 40px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      font-size: 14px;
+    }
+    .compare-table th {
+      background: var(--surface2);
+      padding: 14px 20px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .compare-table th.highlight { color: var(--accent); }
+    .compare-table td {
+      padding: 13px 20px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .compare-table td:first-child { color: var(--text); font-weight: 500; }
+    .compare-table td.highlight { color: var(--text); }
+    .compare-table .check { color: var(--success); font-size: 16px; }
+    .compare-table .cross { color: var(--border); font-size: 16px; }
+
+    /* ── Frameworks ── */
+    .framework-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .fw-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .fw-icon { font-size: 20px; }
+
+    /* ── CTA ── */
+    .cta-block {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(110, 231, 183, 0.06));
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: var(--radius);
+      padding: 56px 40px;
+      text-align: center;
+    }
+    .cta-block h2 {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      margin-bottom: 12px;
+    }
+    .cta-block p { font-size: 16px; color: var(--muted); margin-bottom: 32px; }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .layer-row { grid-template-columns: 40px 1fr; }
+      .layer-badge { display: none; }
+      section { padding: 60px 16px; }
+      .cta-block { padding: 40px 20px; }
+      .stats { gap: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <div class="nav-logo">⚔️ <span>Moat</span></div>
+  <div class="nav-links">
+    <a href="#layers">Layers</a>
+    <a href="#how">How it works</a>
+    <a href="https://github.com/matsulinks/moat">GitHub</a>
+    <a href="https://github.com/matsulinks/moat" class="nav-cta">Get started →</a>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-badge" id="hero-badge">⚡ Free &amp; open source</div>
+  <h1 id="hero-h1">Your AI agent can read files,<br>call APIs, and talk to the internet.<br><em>Is it allowed to?</em></h1>
+  <p class="hero-sub" id="hero-sub">
+    Moat auto-detects your environment and generates a <strong>hardened security config</strong> for your self-hosted AI agents. Under 2 minutes. Zero YAML expertise needed.
+  </p>
+  <div class="hero-actions">
+    <a href="https://github.com/matsulinks/moat" class="btn-primary">
+      ↓ Download free
+    </a>
+    <a href="https://github.com/matsulinks/moat#readme" class="btn-ghost">
+      Read the docs
+    </a>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="terminal-title">Terminal</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-prompt">$ </span><span class="t-cmd">curl -O https://raw.githubusercontent.com/matsulinks/moat/main/setup.py</span></div>
+      <div><span class="t-prompt">$ </span><span class="t-cmd">python3 setup.py --web</span></div>
+      <div class="t-dim">─────────────────────────────────────</div>
+      <div><span class="t-info"> Moat v0.1.0 — Security Setup Wizard</span></div>
+      <div class="t-dim">─────────────────────────────────────</div>
+      <div><span class="t-ok"> ✓</span> Hardware : Raspberry Pi 5 (8 GB)</div>
+      <div><span class="t-ok"> ✓</span> Docker   : v29.2.1</div>
+      <div><span class="t-ok"> ✓</span> Tailscale: installed</div>
+      <div><span class="t-warn"> ⚠</span> Falco    : not installed</div>
+      <div class="t-dim">─────────────────────────────────────</div>
+      <div><span class="t-ok"> ✓</span> Server running → <span class="t-info">http://localhost:8765</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat">
+    <span class="stat-num">7</span>
+    <div class="stat-label">Security layers</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">0</span>
+    <div class="stat-label">pip installs needed</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">&lt;2 min</span>
+    <div class="stat-label">From download to secured</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">1 file</span>
+    <div class="stat-label">Python stdlib only</div>
+  </div>
+</div>
+
+<!-- Problem -->
+<section>
+  <div class="section-label">The problem</div>
+  <h2 class="section-title">Self-hosted agents are powerful<br>and unguarded by default</h2>
+  <p class="section-sub">
+    Frameworks give you powerful agents. They don't give you security. That gap is on you.
+  </p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="icon">🗂️</div>
+      <h3>Unrestricted file access</h3>
+      <p>By default, your agent can read any file your OS user can. Passwords, SSH keys, dotfiles — all reachable.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🌐</div>
+      <h3>Unconstrained network egress</h3>
+      <p>A compromised agent can exfiltrate data to any server. Without egress filtering, you won't know until it's too late.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🔑</div>
+      <h3>Secrets in environment variables</h3>
+      <p>API keys in <code>.env</code> files. Any tool call the agent makes can read them. Leaked once, rotated forever.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🐳</div>
+      <h3>Docker with root privileges</h3>
+      <p>The default docker-compose runs as root with all capabilities. Container escape = full host compromise.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Layers -->
+<section id="layers">
+  <div class="section-label">What Moat hardens</div>
+  <h2 class="section-title">Seven independent security layers</h2>
+  <p class="section-sub">Turn on only what you need. Each layer generates a drop-in config file — no manual YAML editing.</p>
+
+  <div class="layer-list">
+    <div class="layer-row">
+      <div class="layer-num">1</div>
+      <div class="layer-info">
+        <h3>Network isolation</h3>
+        <p>Tailscale ACL + iptables rules that block C2 callbacks and limit agent-to-agent traffic</p>
+      </div>
+      <div class="layer-badge badge-rec">✅ Recommended</div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">2</div>
+      <div class="layer-info">
+        <h3>Docker hardening</h3>
+        <p>Drop-in docker-compose.yml: cap_drop ALL, read-only root, no-new-privileges, resource limits</p>
+      </div>
+      <div class="layer-badge badge-rec">✅ Recommended</div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">3</div>
+      <div class="layer-info">
+        <h3>Auth &amp; access control</h3>
+        <p>API key auth, IP allowlist, per-endpoint rate limiting, request logging</p>
+      </div>
+      <div class="layer-badge badge-rec">✅ Recommended</div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">4</div>
+      <div class="layer-info">
+        <h3>Secrets management</h3>
+        <p>Self-hosted Infisical server for API keys — no more secrets in .env files</p>
+      </div>
+      <div class="layer-badge badge-opt">⚠️ Optional</div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">5</div>
+      <div class="layer-info">
+        <h3>Skill &amp; prompt defense</h3>
+        <p>Block dangerous skill categories. Optional LLM-as-Judge for ambiguous requests.</p>
+      </div>
+      <div class="layer-badge badge-opt">⚠️ Optional</div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">6</div>
+      <div class="layer-info">
+        <h3>Runtime least-privilege</h3>
+        <p>Default-deny tool permissions. Every tool the agent can call is explicitly allowlisted per role.</p>
+      </div>
+      <div class="layer-badge badge-rec">✅ Recommended</div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">7</div>
+      <div class="layer-info">
+        <h3>Observability</h3>
+        <p>Falco syscall monitoring + Prometheus alerts for anomaly detection</p>
+      </div>
+      <div class="layer-badge badge-opt">⚠️ Optional</div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how">
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">Run once. Apply configs.<br>You're hardened.</h2>
+  <p class="section-sub">Moat never installs anything automatically. It generates files — you stay in control.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Download &amp; run</h3>
+      <p>One <code>curl</code> command. Zero dependencies. Python stdlib only.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Auto-detect</h3>
+      <p>Moat scans your hardware, OS, Docker version, Tailscale, and installed security tools.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Choose layers</h3>
+      <p>Browser wizard or terminal UI. Moat recommends based on what it found.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Apply</h3>
+      <p>Copy generated configs into place. Follow the included step-by-step guide.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Comparison -->
+<section>
+  <div class="section-label">Comparison</div>
+  <h2 class="section-title">Not a sandbox. A moat.</h2>
+  <p class="section-sub">Existing tools focus on sandboxing agent code execution. Moat hardens the host and network around the agent.</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>Capability</th>
+        <th>microsandbox</th>
+        <th>DIY YAML</th>
+        <th class="highlight">Moat</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Sandboxes code execution</td>
+        <td class="check">✓</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+      </tr>
+      <tr>
+        <td>Docker hardening</td>
+        <td class="cross">—</td>
+        <td>⚠️ Manual</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>Network egress filtering</td>
+        <td class="cross">—</td>
+        <td>⚠️ Manual</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>Secrets management</td>
+        <td class="cross">—</td>
+        <td>⚠️ Manual</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>Restricts agent tool permissions</td>
+        <td class="cross">—</td>
+        <td>⚠️ Manual</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>Setup wizard for non-experts</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>Environment auto-detection</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="highlight check">✓</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- Frameworks -->
+<section>
+  <div class="section-label">Compatibility</div>
+  <h2 class="section-title">Works with your stack</h2>
+  <p class="section-sub">Layers 1–4 are framework-agnostic. Layers 5–7 add framework-specific hardening where available.</p>
+
+  <div class="framework-grid">
+    <div class="fw-card"><span class="fw-icon">🦅</span> OpenClaw</div>
+    <div class="fw-card"><span class="fw-icon">🦜</span> LangChain</div>
+    <div class="fw-card"><span class="fw-icon">🤖</span> AutoGen</div>
+    <div class="fw-card"><span class="fw-icon">⚙️</span> CrewAI</div>
+    <div class="fw-card"><span class="fw-icon">🦙</span> LlamaIndex</div>
+    <div class="fw-card"><span class="fw-icon">🐋</span> Any Docker agent</div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section>
+  <div class="cta-block">
+    <h2>Secure your agent in 2 minutes</h2>
+    <p>Free. No account. No server. Just a Python script and a browser.</p>
+    <div class="hero-actions" style="margin-bottom:0">
+      <a href="https://github.com/matsulinks/moat" class="btn-primary">↓ Download on GitHub</a>
+      <a href="https://github.com/matsulinks/moat/issues" class="btn-ghost">Report an issue</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <a href="https://github.com/matsulinks/moat">GitHub</a> ·
+    <a href="https://github.com/matsulinks/moat/releases">Releases</a> ·
+    <a href="https://github.com/matsulinks/moat/issues">Issues</a>
+    &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; Made for self-hosted AI builders
+  </p>
+</footer>
+
+<script>
+  // Per-framework copy variations
+  const variants = {
+    openclaw: {
+      badge: "⚡ Built for OpenClaw agents",
+      h1: `OpenClaw is powerful.<br>Is it <em>secured?</em>`,
+      sub: `Moat auto-detects your OpenClaw environment and generates a <strong>hardened security config</strong> in under 2 minutes. No YAML expertise needed.`,
+    },
+    langchain: {
+      badge: "⚡ Built for LangChain agents",
+      h1: `LangChain agents are powerful.<br>Are they <em>secured?</em>`,
+      sub: `Moat auto-detects your LangChain environment and generates a <strong>hardened security config</strong> in under 2 minutes. No YAML expertise needed.`,
+    },
+    autogen: {
+      badge: "⚡ Built for AutoGen agents",
+      h1: `AutoGen agents are powerful.<br>Are they <em>secured?</em>`,
+      sub: `Moat auto-detects your AutoGen environment and generates a <strong>hardened security config</strong> in under 2 minutes. No YAML expertise needed.`,
+    },
+    crewai: {
+      badge: "⚡ Built for CrewAI agents",
+      h1: `CrewAI crews are powerful.<br>Are they <em>secured?</em>`,
+      sub: `Moat auto-detects your CrewAI environment and generates a <strong>hardened security config</strong> in under 2 minutes. No YAML expertise needed.`,
+    },
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const fw = params.get("for");
+  if (fw && variants[fw]) {
+    const v = variants[fw];
+    document.getElementById("hero-badge").innerHTML = v.badge;
+    document.getElementById("hero-h1").innerHTML = v.h1;
+    document.getElementById("hero-sub").innerHTML = v.sub;
+    document.title = `Moat — Security for ${fw.charAt(0).toUpperCase() + fw.slice(1)} agents`;
+  }
+</script>
+
+</body>
+</html>
