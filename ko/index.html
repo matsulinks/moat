@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moat — 셀프호스팅 AI 에이전트 보안</title>
+  <meta name="description" content="Moat는 환경을 자동으로 감지하여 2분 이내에 셀프호스팅 AI 에이전트를 위한 강화된 보안 설정을 생성합니다. YAML 지식 불필요.">
+  <meta property="og:title" content="Moat — 셀프호스팅 AI 에이전트 보안">
+  <meta property="og:description" content="Moat는 환경을 자동으로 감지하여 2분 이내에 셀프호스팅 AI 에이전트를 위한 강화된 보안 설정을 생성합니다. YAML 지식 불필요.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://getmoat.work/ko">
+  <link rel="canonical" href="https://getmoat.work/ko">
+  <style>
+    :root { --bg:#0b0f1a;--surface:#141928;--surface2:#1e2537;--border:#2a3450;--text:#e2e8f0;--muted:#8892a4;--accent:#38bdf8;--accent2:#6ee7b7;--danger:#f87171;--warn:#fbbf24;--success:#34d399;--radius:12px;--radius-sm:6px; }
+    * { box-sizing:border-box;margin:0;padding:0; }
+    body { background:var(--bg);color:var(--text);font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.7;font-size:16px; }
+    a { color:var(--accent);text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    nav { position:sticky;top:0;z-index:100;background:rgba(11,15,26,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between; }
+    .nav-logo { font-weight:700;font-size:18px;color:var(--text);display:flex;align-items:center;gap:8px; }
+    .nav-logo span { color:var(--accent); }
+    .nav-links { display:flex;gap:24px;align-items:center;font-size:14px;color:var(--muted); }
+    .nav-links a { color:var(--muted); }
+    .nav-links a:hover { color:var(--text);text-decoration:none; }
+    .nav-lang { font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:999px; }
+    .nav-lang:hover { color:var(--text);text-decoration:none; }
+    .nav-cta { background:var(--accent);color:#0b0f1a !important;font-weight:700;padding:6px 16px;border-radius:var(--radius-sm);font-size:13px; }
+    .nav-cta:hover { opacity:0.9;text-decoration:none !important; }
+    section { padding:80px 24px;max-width:960px;margin:0 auto; }
+    .hero { text-align:center;padding-top:100px;padding-bottom:80px; }
+    .hero-badge { display:inline-flex;align-items:center;gap:6px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:var(--accent);font-size:12px;font-weight:700;letter-spacing:0.06em;padding:5px 14px;border-radius:999px;margin-bottom:24px; }
+    .hero h1 { font-size:clamp(30px,5.5vw,58px);font-weight:900;letter-spacing:-1px;line-height:1.15;margin-bottom:20px; }
+    .hero h1 em { font-style:normal;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+    .hero-sub { font-size:clamp(15px,2.2vw,18px);color:var(--muted);max-width:560px;margin:0 auto 40px;line-height:1.7; }
+    .hero-sub strong { color:var(--text); }
+    .hero-actions { display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px; }
+    .btn-primary { background:var(--accent);color:#0b0f1a;font-weight:700;font-size:15px;padding:12px 28px;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:8px;transition:opacity 0.15s; }
+    .btn-primary:hover { opacity:0.88;text-decoration:none; }
+    .btn-ghost { background:transparent;color:var(--text);font-weight:600;font-size:15px;padding:12px 28px;border-radius:var(--radius-sm);border:1px solid var(--border);display:inline-flex;align-items:center;gap:8px;transition:border-color 0.15s; }
+    .btn-ghost:hover { border-color:var(--accent);text-decoration:none; }
+    .terminal { background:#0d1117;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:640px;margin:0 auto;text-align:left;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+    .terminal-bar { background:var(--surface2);padding:10px 16px;display:flex;gap:7px;align-items:center; }
+    .dot { width:12px;height:12px;border-radius:50%; }
+    .dot-r { background:#ff5f57; } .dot-y { background:#febc2e; } .dot-g { background:#28c840; }
+    .terminal-title { font-size:12px;color:var(--muted);margin:0 auto; }
+    .terminal-body { padding:20px 24px;font-family:"SF Mono","Fira Code",monospace;font-size:13px;line-height:1.75; }
+    .t-prompt { color:var(--accent2); } .t-cmd { color:var(--text); } .t-ok { color:var(--success); } .t-warn { color:var(--warn); } .t-info { color:var(--accent); } .t-dim { color:#4a5568; }
+    .stats { display:flex;justify-content:center;gap:48px;flex-wrap:wrap;padding:48px 24px;border-top:1px solid var(--border);border-bottom:1px solid var(--border); }
+    .stat { text-align:center; }
+    .stat-num { font-size:36px;font-weight:800;letter-spacing:-1px;color:var(--accent);display:block; }
+    .stat-label { font-size:13px;color:var(--muted);margin-top:2px; }
+    .section-label { font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px; }
+    h2.section-title { font-size:clamp(22px,3.5vw,34px);font-weight:900;letter-spacing:-0.5px;margin-bottom:16px;line-height:1.25; }
+    .section-sub { font-size:15px;color:var(--muted);max-width:520px;line-height:1.7; }
+    .problem-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:40px; }
+    .problem-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px; }
+    .problem-card .icon { font-size:28px;margin-bottom:12px; }
+    .problem-card h3 { font-size:15px;font-weight:700;margin-bottom:8px; }
+    .problem-card p { font-size:14px;color:var(--muted);line-height:1.65; }
+    .scenario { background:var(--surface);border:1px solid rgba(248,113,113,0.3);border-radius:var(--radius);padding:28px 32px;margin-top:40px; }
+    .scenario-label { font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--danger);margin-bottom:16px; }
+    .scenario-line { font-size:14px;color:var(--muted);line-height:1.8;padding-left:16px;border-left:2px solid var(--border);margin-bottom:8px; }
+    .scenario-line strong { color:var(--text); }
+    .scenario-line.bad { border-left-color:var(--danger); }
+    .scenario-line.good { border-left-color:var(--success); }
+    .layer-list { margin-top:40px;display:flex;flex-direction:column;gap:12px; }
+    .layer-row { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;display:grid;grid-template-columns:48px 1fr auto;gap:16px;align-items:center;transition:border-color 0.15s; }
+    .layer-row:hover { border-color:rgba(56,189,248,0.4); }
+    .layer-num { font-size:20px;font-weight:800;color:var(--accent);font-family:"SF Mono",monospace; }
+    .layer-info h3 { font-size:15px;font-weight:700;margin-bottom:4px; }
+    .layer-info p { font-size:13px;color:var(--muted); }
+    .layer-badge { font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap; }
+    .badge-rec { background:rgba(52,211,153,0.15);color:var(--success); }
+    .badge-opt { background:rgba(251,191,36,0.15);color:var(--warn); }
+    .steps { display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;margin-top:40px; }
+    .step { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;position:relative; }
+    .step-num { font-size:48px;font-weight:900;color:rgba(56,189,248,0.12);font-family:"SF Mono",monospace;position:absolute;top:12px;right:20px;line-height:1; }
+    .step h3 { font-size:16px;font-weight:700;margin-bottom:8px; }
+    .step p { font-size:13px;color:var(--muted);line-height:1.65; }
+    .framework-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:32px; }
+    .fw-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500; }
+    .fw-icon { font-size:20px; }
+    .faq { margin-top:40px;display:flex;flex-direction:column;gap:2px; }
+    .faq-item { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm); }
+    .faq-q { padding:18px 24px;font-size:15px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center; }
+    .faq-q::after { content:"＋";color:var(--muted);font-weight:400; }
+    .faq-item.open .faq-q::after { content:"－"; }
+    .faq-a { display:none;padding:0 24px 18px;font-size:14px;color:var(--muted);line-height:1.7; }
+    .faq-item.open .faq-a { display:block; }
+    .cta-block { background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(110,231,183,0.06));border:1px solid rgba(56,189,248,0.2);border-radius:var(--radius);padding:56px 40px;text-align:center; }
+    .cta-block h2 { font-size:clamp(22px,4vw,34px);font-weight:900;letter-spacing:-0.5px;margin-bottom:12px; }
+    .cta-block p { font-size:16px;color:var(--muted);margin-bottom:32px;line-height:1.7; }
+    footer { border-top:1px solid var(--border);padding:32px 24px;text-align:center;font-size:13px;color:var(--muted); }
+    footer a { color:var(--muted); }
+    footer a:hover { color:var(--text);text-decoration:none; }
+    .footer-lang { margin-bottom:12px; }
+    @media (max-width:600px) { .nav-links{display:none;} .layer-row{grid-template-columns:40px 1fr;} .layer-badge{display:none;} section{padding:60px 16px;} .cta-block{padding:40px 20px;} .stats{gap:28px;} }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://getmoat.work" class="nav-logo">Moat<span>.</span></a>
+  <div class="nav-links">
+    <a href="#layers">보안 레이어</a>
+    <a href="#how">작동 원리</a>
+    <a href="https://github.com/getmoat/moat">GitHub</a>
+    <a href="https://getmoat.work" class="nav-lang">🌐 English</a>
+    <a href="https://getmoat.work/ja" class="nav-lang">🇯🇵 日本語</a>
+    <a href="https://github.com/getmoat/moat/releases" class="nav-cta">무료 다운로드 →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge" id="hero-badge">⚡ 무료 오픈소스</div>
+  <h1 id="hero-h1">
+    AI 에이전트가 파일을 읽고,<br>
+    API를 호출하며 인터넷과 통신합니다.<br>
+    <em>허가하셨나요?</em>
+  </h1>
+  <p class="hero-sub" id="hero-sub">
+    Moat는 환경을 자동으로 감지하여 2분 이내에 셀프호스팅 AI 에이전트를 위한 <strong>강화된 보안 설정을 생성</strong>합니다. YAML 지식 불필요.
+  </p>
+  <div class="hero-actions">
+    <a href="https://github.com/getmoat/moat/releases" class="btn-primary">↓ 무료 다운로드</a>
+    <a href="https://github.com/getmoat/moat/wiki" class="btn-ghost">문서 보기</a>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="terminal-title">moat — bash</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-prompt">$</span> <span class="t-cmd">curl -fsSL https://getmoat.work/install.sh | python3</span></div>
+      <div class="t-dim">Moat v0.9.1 — 환경 감지 중...</div>
+      <br>
+      <div><span class="t-ok">✓</span> <span class="t-cmd">Docker</span> <span class="t-ok">설치됨</span> <span class="t-dim">(v24.0.7)</span></div>
+      <div><span class="t-ok">✓</span> <span class="t-cmd">Tailscale</span> <span class="t-ok">설치됨</span> <span class="t-dim">(활성)</span></div>
+      <div><span class="t-warn">⚠</span> <span class="t-cmd">Falco</span> <span class="t-warn">미설치</span></div>
+      <div><span class="t-warn">⚠</span> <span class="t-cmd">Infisical</span> <span class="t-warn">미설치</span></div>
+      <br>
+      <div><span class="t-info">→</span> 설정 UI 시작 중 <span class="t-dim">http://localhost:4317</span></div>
+      <div><span class="t-ok">✓</span> 서버 시작</div>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat">
+    <span class="stat-num">7개</span>
+    <div class="stat-label">보안 레이어</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">0개</span>
+    <div class="stat-label">pip 설치</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">2분</span>
+    <div class="stat-label">다운로드부터 완료까지</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">단일 파일</span>
+    <div class="stat-label">Python 표준 라이브러리만</div>
+  </div>
+</div>
+
+<section id="problem">
+  <div class="section-label">문제</div>
+  <h2 class="section-title">AI 에이전트 프레임워크는 강력합니다.<br>보안은 기본 제공되지 않습니다.</h2>
+  <p class="section-sub">OpenClaw, LangChain, AutoGen — 모두 에이전트를 실행합니다. 에이전트를 보호하는 것은 당신의 책임입니다.</p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="icon">🗂️</div>
+      <h3>무제한 파일 접근</h3>
+      <p>기본적으로 에이전트는 OS 사용자가 읽을 수 있는 모든 파일에 접근할 수 있습니다. SSH 키, 비밀번호, 설정 파일 — 모두 노출됩니다.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🌐</div>
+      <h3>무제한 네트워크 통신</h3>
+      <p>침해된 에이전트는 임의의 서버로 데이터를 전송할 수 있습니다. 아웃바운드 필터링 없이는 이미 늦었을 때 알게 됩니다.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🔑</div>
+      <h3>환경 변수에 저장된 시크릿</h3>
+      <p>.env 파일의 API 키는 에이전트의 모든 도구 호출에서 읽을 수 있습니다. 한 번 유출되면 영구히 교체해야 합니다.</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🐳</div>
+      <h3>루트로 실행되는 Docker</h3>
+      <p>기본 docker-compose는 모든 권한을 가진 루트로 실행됩니다. 컨테이너 탈출 = 호스트 완전 장악.</p>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-label">⚠️ 최악의 시나리오 (실제로 발생합니다)</div>
+    <div class="scenario-line bad">공격자가 에이전트에 프롬프트 인젝션을 보냄</div>
+    <div class="scenario-line bad">에이전트가 <strong>~/.ssh/id_rsa</strong>를 읽어 외부 서버로 POST</div>
+    <div class="scenario-line bad">GitHub 저장소에 무단 접근 시작</div>
+    <div class="scenario-line bad">다음 날 낯선 커밋을 발견</div>
+    <div class="scenario-line good"><strong>Moat를 사용했다면:</strong> 도구 권한 기본 거부. 외부 통신은 화이트리스트 도메인만 허용. 즉시 로그 기록.</div>
+  </div>
+</section>
+
+<section id="layers">
+  <div class="section-label">Moat가 강화하는 것</div>
+  <h2 class="section-title">7개의 독립적인 보안 레이어</h2>
+  <p class="section-sub">필요한 레이어만 선택하세요. 각 레이어는 바로 사용 가능한 설정 파일을 생성합니다 — YAML을 직접 작성할 필요 없습니다.</p>
+  <div class="layer-list">
+    <div class="layer-row">
+      <div class="layer-num">01</div>
+      <div class="layer-info">
+        <h3>네트워크 격리</h3>
+        <p>Tailscale ACL + iptables로 C2 콜백 차단 및 에이전트 간 트래픽 제한</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 권장</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">02</div>
+      <div class="layer-info">
+        <h3>Docker 강화</h3>
+        <p>cap_drop ALL, 읽기 전용 루트fs, no-new-privileges, 리소스 제한</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 권장</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">03</div>
+      <div class="layer-info">
+        <h3>인증 및 접근 제어</h3>
+        <p>API 키 인증, IP 허용 목록, 엔드포인트별 속도 제한, 요청 로깅</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 권장</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">04</div>
+      <div class="layer-info">
+        <h3>시크릿 관리</h3>
+        <p>.env API 키를 안전하게 관리하는 셀프호스팅 Infisical 서버 (8GB+ RAM 권장)</p>
+      </div>
+      <span class="layer-badge badge-opt">⚠️ 선택</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">05</div>
+      <div class="layer-info">
+        <h3>스킬 및 프롬프트 방어</h3>
+        <p>위험한 스킬 카테고리 차단. LLM-as-Judge로 모호한 요청 검사 가능</p>
+      </div>
+      <span class="layer-badge badge-opt">⚠️ 선택</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">06</div>
+      <div class="layer-info">
+        <h3>런타임 최소 권한</h3>
+        <p>도구 호출 기본 거부. 역할별로 사용 가능한 도구를 명시적으로 허용</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 권장</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">07</div>
+      <div class="layer-info">
+        <h3>관측성</h3>
+        <p>Falco 시스템 콜 모니터링 + Prometheus 알림으로 이상 감지</p>
+      </div>
+      <span class="layer-badge badge-opt">⚠️ 선택</span>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="section-label">사용 방법</div>
+  <h2 class="section-title">한 번 실행. 설정 적용.<br>완료.</h2>
+  <p class="section-sub">Moat는 아무것도 자동으로 설치하지 않습니다. 파일만 생성합니다 — 제어권은 항상 당신에게 있습니다.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>다운로드 &amp; 실행</h3>
+      <p>curl 한 줄, 의존성 없음, Python 표준 라이브러리만</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>자동 감지</h3>
+      <p>하드웨어, OS, Docker 버전, Tailscale, 설치된 보안 도구를 자동 스캔</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>레이어 선택</h3>
+      <p>브라우저 또는 터미널 UI. 감지 결과에 따라 권장 레이어 제시</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>적용</h3>
+      <p>생성된 설정 파일을 지정 위치에 배치. 동봉된 가이드를 따르세요</p>
+    </div>
+  </div>
+</section>
+
+<section id="compat">
+  <div class="section-label">호환성</div>
+  <h2 class="section-title">사용 중인 스택과 호환</h2>
+  <p class="section-sub">레이어 1-4는 프레임워크 독립적. 레이어 5-7은 프레임워크별 강화 설정을 추가합니다.</p>
+  <div class="framework-grid">
+    <div class="fw-card"><span class="fw-icon">🦅</span> OpenClaw</div>
+    <div class="fw-card"><span class="fw-icon">🔗</span> LangChain</div>
+    <div class="fw-card"><span class="fw-icon">🤖</span> AutoGen</div>
+    <div class="fw-card"><span class="fw-icon">👥</span> CrewAI</div>
+    <div class="fw-card"><span class="fw-icon">🦙</span> LlamaIndex</div>
+    <div class="fw-card"><span class="fw-icon">🐳</span> Docker 기반 전체</div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="section-label">자주 묻는 질문</div>
+  <h2 class="section-title">FAQ</h2>
+  <div class="faq">
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Moat가 무언가를 설치하나요?</div>
+      <div class="faq-a">아니요. Moat는 설정 파일만 생성합니다. 실제 설치와 설정 변경은 직접 하셔야 합니다. Moat는 아무것도 자동으로 변경하지 않습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Raspberry Pi 4에서도 작동하나요?</div>
+      <div class="faq-a">네. Raspberry Pi 4(4GB)에서는 레이어 1-3과 레이어 6을 사용할 수 있습니다. Infisical은 8GB+ 메모리를 권장하므로 Pi 4에서는 레이어 4를 건너뛰는 것을 권장합니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">의존성이 무엇인가요?</div>
+      <div class="faq-a">Python 3.8 이상만 필요합니다. 외부 패키지가 필요 없습니다(pip install 없음). Python 표준 라이브러리만으로 완결됩니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">소스 코드가 공개되어 있나요?</div>
+      <div class="faq-a">네, MIT 라이선스로 GitHub에 공개되어 있습니다. 보안 소프트웨어이므로 코드를 직접 확인할 수 있다는 것이 중요하다고 생각합니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">나중에 유료가 되나요?</div>
+      <div class="faq-a">핵심 기능은 영구 무료로 유지됩니다. 향후 커뮤니티 위협 인텔리전스(자동 규칙 업데이트) 유료 플랜을 계획하고 있습니다. 핵심 도구는 항상 무료입니다.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="cta-block">
+    <h2>2분 만에 에이전트 보안 강화</h2>
+    <p>무료. 계정 불필요. 서버 불필요.<br>Python 스크립트 하나와 브라우저만 있으면 됩니다.</p>
+    <div class="hero-actions">
+      <a href="https://github.com/getmoat/moat/releases" class="btn-primary">↓ GitHub에서 무료 다운로드</a>
+      <a href="https://github.com/getmoat/moat/issues" class="btn-ghost">이슈 신고</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-lang">
+    <a href="https://getmoat.work">🌐 English</a> &nbsp;·&nbsp;
+    <a href="https://getmoat.work/ja">🇯🇵 日本語</a>
+  </div>
+  MIT 라이선스 · 셀프호스팅 AI 빌더를 위해
+</footer>
+
+<script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var fw = params.get('for');
+    var variants = {
+      openclaw: {
+        badge: '⚡ OpenClaw 에이전트 전용',
+        h1: 'OpenClaw는 강력합니다.<br>그것은 <em>안전한가요?</em>',
+        sub: 'Moat가 <strong>OpenClaw 환경을 자동 감지</strong>하여 2분 내에 강화된 보안 설정을 생성합니다.'
+      },
+      langchain: {
+        badge: '⚡ LangChain 에이전트 전용',
+        h1: 'LangChain은 강력합니다.<br>그것은 <em>안전한가요?</em>',
+        sub: 'Moat가 <strong>LangChain 환경을 자동 감지</strong>하여 2분 내에 강화된 보안 설정을 생성합니다.'
+      },
+      autogen: {
+        badge: '⚡ AutoGen 에이전트 전용',
+        h1: 'AutoGen은 강력합니다.<br>그것은 <em>안전한가요?</em>',
+        sub: 'Moat가 <strong>AutoGen 환경을 자동 감지</strong>하여 2분 내에 강화된 보안 설정을 생성합니다.'
+      }
+    };
+    if (fw && variants[fw]) {
+      var v = variants[fw];
+      document.getElementById('hero-badge').textContent = v.badge;
+      document.getElementById('hero-h1').innerHTML = v.h1;
+      document.getElementById('hero-sub').innerHTML = v.sub;
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moat — 自托管 AI 智能体的安全防护</title>
+  <meta name="description" content="Moat 自动检测你的环境，在 2 分钟内生成针对自托管 AI 智能体的加固安全配置。无需 YAML 知识。">
+  <meta property="og:title" content="Moat — 自托管 AI 智能体的安全防护">
+  <meta property="og:description" content="Moat 自动检测你的环境，在 2 分钟内生成针对自托管 AI 智能体的加固安全配置。无需 YAML 知识。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://getmoat.work/zh">
+  <link rel="canonical" href="https://getmoat.work/zh">
+  <style>
+    :root { --bg:#0b0f1a;--surface:#141928;--surface2:#1e2537;--border:#2a3450;--text:#e2e8f0;--muted:#8892a4;--accent:#38bdf8;--accent2:#6ee7b7;--danger:#f87171;--warn:#fbbf24;--success:#34d399;--radius:12px;--radius-sm:6px; }
+    * { box-sizing:border-box;margin:0;padding:0; }
+    body { background:var(--bg);color:var(--text);font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif;line-height:1.7;font-size:16px; }
+    a { color:var(--accent);text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    nav { position:sticky;top:0;z-index:100;background:rgba(11,15,26,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between; }
+    .nav-logo { font-weight:700;font-size:18px;color:var(--text);display:flex;align-items:center;gap:8px; }
+    .nav-logo span { color:var(--accent); }
+    .nav-links { display:flex;gap:24px;align-items:center;font-size:14px;color:var(--muted); }
+    .nav-links a { color:var(--muted); }
+    .nav-links a:hover { color:var(--text);text-decoration:none; }
+    .nav-lang { font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:999px; }
+    .nav-lang:hover { color:var(--text);text-decoration:none; }
+    .nav-cta { background:var(--accent);color:#0b0f1a !important;font-weight:700;padding:6px 16px;border-radius:var(--radius-sm);font-size:13px; }
+    .nav-cta:hover { opacity:0.9;text-decoration:none !important; }
+    section { padding:80px 24px;max-width:960px;margin:0 auto; }
+    .hero { text-align:center;padding-top:100px;padding-bottom:80px; }
+    .hero-badge { display:inline-flex;align-items:center;gap:6px;background:rgba(56,189,248,0.1);border:1px solid rgba(56,189,248,0.3);color:var(--accent);font-size:12px;font-weight:700;letter-spacing:0.06em;padding:5px 14px;border-radius:999px;margin-bottom:24px; }
+    .hero h1 { font-size:clamp(30px,5.5vw,58px);font-weight:900;letter-spacing:-1px;line-height:1.15;margin-bottom:20px; }
+    .hero h1 em { font-style:normal;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+    .hero-sub { font-size:clamp(15px,2.2vw,18px);color:var(--muted);max-width:560px;margin:0 auto 40px;line-height:1.7; }
+    .hero-sub strong { color:var(--text); }
+    .hero-actions { display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:48px; }
+    .btn-primary { background:var(--accent);color:#0b0f1a;font-weight:700;font-size:15px;padding:12px 28px;border-radius:var(--radius-sm);display:inline-flex;align-items:center;gap:8px;transition:opacity 0.15s; }
+    .btn-primary:hover { opacity:0.88;text-decoration:none; }
+    .btn-ghost { background:transparent;color:var(--text);font-weight:600;font-size:15px;padding:12px 28px;border-radius:var(--radius-sm);border:1px solid var(--border);display:inline-flex;align-items:center;gap:8px;transition:border-color 0.15s; }
+    .btn-ghost:hover { border-color:var(--accent);text-decoration:none; }
+    .terminal { background:#0d1117;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;max-width:640px;margin:0 auto;text-align:left;box-shadow:0 24px 80px rgba(0,0,0,0.6); }
+    .terminal-bar { background:var(--surface2);padding:10px 16px;display:flex;gap:7px;align-items:center; }
+    .dot { width:12px;height:12px;border-radius:50%; }
+    .dot-r { background:#ff5f57; } .dot-y { background:#febc2e; } .dot-g { background:#28c840; }
+    .terminal-title { font-size:12px;color:var(--muted);margin:0 auto; }
+    .terminal-body { padding:20px 24px;font-family:"SF Mono","Fira Code",monospace;font-size:13px;line-height:1.75; }
+    .t-prompt { color:var(--accent2); } .t-cmd { color:var(--text); } .t-ok { color:var(--success); } .t-warn { color:var(--warn); } .t-info { color:var(--accent); } .t-dim { color:#4a5568; }
+    .stats { display:flex;justify-content:center;gap:48px;flex-wrap:wrap;padding:48px 24px;border-top:1px solid var(--border);border-bottom:1px solid var(--border); }
+    .stat { text-align:center; }
+    .stat-num { font-size:36px;font-weight:800;letter-spacing:-1px;color:var(--accent);display:block; }
+    .stat-label { font-size:13px;color:var(--muted);margin-top:2px; }
+    .section-label { font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:12px; }
+    h2.section-title { font-size:clamp(22px,3.5vw,34px);font-weight:900;letter-spacing:-0.5px;margin-bottom:16px;line-height:1.25; }
+    .section-sub { font-size:15px;color:var(--muted);max-width:520px;line-height:1.7; }
+    .problem-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:40px; }
+    .problem-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px; }
+    .problem-card .icon { font-size:28px;margin-bottom:12px; }
+    .problem-card h3 { font-size:15px;font-weight:700;margin-bottom:8px; }
+    .problem-card p { font-size:14px;color:var(--muted);line-height:1.65; }
+    .scenario { background:var(--surface);border:1px solid rgba(248,113,113,0.3);border-radius:var(--radius);padding:28px 32px;margin-top:40px; }
+    .scenario-label { font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--danger);margin-bottom:16px; }
+    .scenario-line { font-size:14px;color:var(--muted);line-height:1.8;padding-left:16px;border-left:2px solid var(--border);margin-bottom:8px; }
+    .scenario-line strong { color:var(--text); }
+    .scenario-line.bad { border-left-color:var(--danger); }
+    .scenario-line.good { border-left-color:var(--success); }
+    .layer-list { margin-top:40px;display:flex;flex-direction:column;gap:12px; }
+    .layer-row { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;display:grid;grid-template-columns:48px 1fr auto;gap:16px;align-items:center;transition:border-color 0.15s; }
+    .layer-row:hover { border-color:rgba(56,189,248,0.4); }
+    .layer-num { font-size:20px;font-weight:800;color:var(--accent);font-family:"SF Mono",monospace; }
+    .layer-info h3 { font-size:15px;font-weight:700;margin-bottom:4px; }
+    .layer-info p { font-size:13px;color:var(--muted); }
+    .layer-badge { font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap; }
+    .badge-rec { background:rgba(52,211,153,0.15);color:var(--success); }
+    .badge-opt { background:rgba(251,191,36,0.15);color:var(--warn); }
+    .steps { display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;margin-top:40px; }
+    .step { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;position:relative; }
+    .step-num { font-size:48px;font-weight:900;color:rgba(56,189,248,0.12);font-family:"SF Mono",monospace;position:absolute;top:12px;right:20px;line-height:1; }
+    .step h3 { font-size:16px;font-weight:700;margin-bottom:8px; }
+    .step p { font-size:13px;color:var(--muted);line-height:1.65; }
+    .framework-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:32px; }
+    .fw-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500; }
+    .fw-icon { font-size:20px; }
+    .faq { margin-top:40px;display:flex;flex-direction:column;gap:2px; }
+    .faq-item { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm); }
+    .faq-q { padding:18px 24px;font-size:15px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center; }
+    .faq-q::after { content:"＋";color:var(--muted);font-weight:400; }
+    .faq-item.open .faq-q::after { content:"－"; }
+    .faq-a { display:none;padding:0 24px 18px;font-size:14px;color:var(--muted);line-height:1.7; }
+    .faq-item.open .faq-a { display:block; }
+    .cta-block { background:linear-gradient(135deg,rgba(56,189,248,0.08),rgba(110,231,183,0.06));border:1px solid rgba(56,189,248,0.2);border-radius:var(--radius);padding:56px 40px;text-align:center; }
+    .cta-block h2 { font-size:clamp(22px,4vw,34px);font-weight:900;letter-spacing:-0.5px;margin-bottom:12px; }
+    .cta-block p { font-size:16px;color:var(--muted);margin-bottom:32px;line-height:1.7; }
+    footer { border-top:1px solid var(--border);padding:32px 24px;text-align:center;font-size:13px;color:var(--muted); }
+    footer a { color:var(--muted); }
+    footer a:hover { color:var(--text);text-decoration:none; }
+    .footer-lang { margin-bottom:12px; }
+    @media (max-width:600px) { .nav-links{display:none;} .layer-row{grid-template-columns:40px 1fr;} .layer-badge{display:none;} section{padding:60px 16px;} .cta-block{padding:40px 20px;} .stats{gap:28px;} }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="https://getmoat.work" class="nav-logo">Moat<span>.</span></a>
+  <div class="nav-links">
+    <a href="#layers">安全层</a>
+    <a href="#how">工作原理</a>
+    <a href="https://github.com/getmoat/moat">GitHub</a>
+    <a href="https://getmoat.work" class="nav-lang">🌐 English</a>
+    <a href="https://getmoat.work/ja" class="nav-lang">🇯🇵 日本語</a>
+    <a href="https://github.com/getmoat/moat/releases" class="nav-cta">免费下载 →</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge" id="hero-badge">⚡ 免费开源</div>
+  <h1 id="hero-h1">
+    你的 AI 智能体可以读取文件、<br>
+    调用 API 与互联网通信。<br>
+    <em>这已经授权了吗？</em>
+  </h1>
+  <p class="hero-sub" id="hero-sub">
+    Moat 自动检测你的环境，在 2 分钟内生成针对自托管 AI 智能体的<strong>加固安全配置</strong>。无需 YAML 知识。
+  </p>
+  <div class="hero-actions">
+    <a href="https://github.com/getmoat/moat/releases" class="btn-primary">↓ 免费下载</a>
+    <a href="https://github.com/getmoat/moat/wiki" class="btn-ghost">阅读文档</a>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div>
+      <div class="dot dot-y"></div>
+      <div class="dot dot-g"></div>
+      <span class="terminal-title">moat — bash</span>
+    </div>
+    <div class="terminal-body">
+      <div><span class="t-prompt">$</span> <span class="t-cmd">curl -fsSL https://getmoat.work/install.sh | python3</span></div>
+      <div class="t-dim">Moat v0.9.1 — 环境检测中...</div>
+      <br>
+      <div><span class="t-ok">✓</span> <span class="t-cmd">Docker</span> <span class="t-ok">已安装</span> <span class="t-dim">(v24.0.7)</span></div>
+      <div><span class="t-ok">✓</span> <span class="t-cmd">Tailscale</span> <span class="t-ok">已安装</span> <span class="t-dim">(活跃)</span></div>
+      <div><span class="t-warn">⚠</span> <span class="t-cmd">Falco</span> <span class="t-warn">未安装</span></div>
+      <div><span class="t-warn">⚠</span> <span class="t-cmd">Infisical</span> <span class="t-warn">未安装</span></div>
+      <br>
+      <div><span class="t-info">→</span> 正在启动配置界面 <span class="t-dim">http://localhost:4317</span></div>
+      <div><span class="t-ok">✓</span> 启动完成</div>
+    </div>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat">
+    <span class="stat-num">7</span>
+    <div class="stat-label">个安全层</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">0</span>
+    <div class="stat-label">个pip依赖</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">2分钟</span>
+    <div class="stat-label">从下载到完成配置</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">单文件</span>
+    <div class="stat-label">仅需Python标准库</div>
+  </div>
+</div>
+
+<section id="problem">
+  <div class="section-label">问题</div>
+  <h2 class="section-title">AI 智能体框架功能强大，<br>但默认不包含安全配置。</h2>
+  <p class="section-sub">OpenClaw、LangChain、AutoGen 都能运行智能体，但守护智能体的安全是你的责任。</p>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="icon">🗂️</div>
+      <h3>无限制的文件访问</h3>
+      <p>默认情况下，智能体可以读取操作系统用户能访问的所有文件。SSH 密钥、密码、配置文件——无一例外。</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🌐</div>
+      <h3>不受限的网络通信</h3>
+      <p>被攻击的智能体可将数据发送至任意服务器。没有出站过滤，发现时往往为时已晚。</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🔑</div>
+      <h3>环境变量中的密钥</h3>
+      <p>.env 文件中的 API 密钥可被智能体的任何工具调用读取。一旦泄露，需要永久轮换。</p>
+    </div>
+    <div class="problem-card">
+      <div class="icon">🐳</div>
+      <h3>以 root 运行的 Docker</h3>
+      <p>默认 docker-compose 以 root 身份运行并拥有所有权限。容器逃逸 = 主机完全沦陷。</p>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <div class="scenario-label">⚠️ 最坏情况（真实发生过）</div>
+    <div class="scenario-line bad">攻击者向智能体发送提示注入</div>
+    <div class="scenario-line bad">智能体读取 <strong>~/.ssh/id_rsa</strong> 并 POST 到外部服务器</div>
+    <div class="scenario-line bad">GitHub 仓库遭到未授权访问</div>
+    <div class="scenario-line bad">次日你发现了陌生的 commit</div>
+    <div class="scenario-line good"><strong>使用 Moat 的话：</strong> 工具权限默认拒绝。外部通信仅允许白名单域名。实时记录日志。</div>
+  </div>
+</section>
+
+<section id="layers">
+  <div class="section-label">Moat 加固的内容</div>
+  <h2 class="section-title">七个独立的安全层</h2>
+  <p class="section-sub">按需启用。每层生成一个可直接使用的配置文件——无需手动编写 YAML。</p>
+  <div class="layer-list">
+    <div class="layer-row">
+      <div class="layer-num">01</div>
+      <div class="layer-info">
+        <h3>网络隔离</h3>
+        <p>Tailscale ACL + iptables，阻断 C2 回调并限制智能体间流量</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 推荐</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">02</div>
+      <div class="layer-info">
+        <h3>Docker 加固</h3>
+        <p>cap_drop ALL、只读根文件系统、no-new-privileges、资源限制</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 推荐</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">03</div>
+      <div class="layer-info">
+        <h3>认证与访问控制</h3>
+        <p>API 密钥认证、IP 白名单、端点级限速、请求日志</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 推荐</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">04</div>
+      <div class="layer-info">
+        <h3>密钥管理</h3>
+        <p>自托管 Infisical 服务器，安全管理 .env 中的 API 密钥（建议 8GB+ 内存）</p>
+      </div>
+      <span class="layer-badge badge-opt">⚠️ 可选</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">05</div>
+      <div class="layer-info">
+        <h3>技能与提示词防御</h3>
+        <p>屏蔽危险技能类别，可选 LLM-as-Judge 审查模糊请求</p>
+      </div>
+      <span class="layer-badge badge-opt">⚠️ 可选</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">06</div>
+      <div class="layer-info">
+        <h3>运行时最小权限</h3>
+        <p>工具调用默认拒绝。每个角色的可用工具需显式授权</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 推荐</span>
+    </div>
+    <div class="layer-row">
+      <div class="layer-num">07</div>
+      <div class="layer-info">
+        <h3>可观测性</h3>
+        <p>Falco 系统调用监控 + Prometheus 告警，实现异常检测</p>
+      </div>
+      <span class="layer-badge badge-opt">⚠️ 可选</span>
+    </div>
+  </div>
+</section>
+
+<section id="how">
+  <div class="section-label">使用方法</div>
+  <h2 class="section-title">运行一次，应用配置，<br>完成。</h2>
+  <p class="section-sub">Moat 不会自动安装任何内容——只生成文件，控制权始终在你手中。</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>下载并运行</h3>
+      <p>curl 一条命令，无依赖，仅需 Python 标准库</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>自动检测</h3>
+      <p>扫描硬件、操作系统、Docker 版本、Tailscale 及已安装的安全工具</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>选择安全层</h3>
+      <p>浏览器或终端界面。根据检测结果推荐安全层</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>应用配置</h3>
+      <p>将生成的配置文件放到指定位置，按随附的安装指南操作即可</p>
+    </div>
+  </div>
+</section>
+
+<section id="compat">
+  <div class="section-label">兼容性</div>
+  <h2 class="section-title">兼容你的技术栈</h2>
+  <p class="section-sub">第 1-4 层与框架无关。第 5-7 层提供框架专属加固配置。</p>
+  <div class="framework-grid">
+    <div class="fw-card"><span class="fw-icon">🦅</span> OpenClaw</div>
+    <div class="fw-card"><span class="fw-icon">🔗</span> LangChain</div>
+    <div class="fw-card"><span class="fw-icon">🤖</span> AutoGen</div>
+    <div class="fw-card"><span class="fw-icon">👥</span> CrewAI</div>
+    <div class="fw-card"><span class="fw-icon">🦙</span> LlamaIndex</div>
+    <div class="fw-card"><span class="fw-icon">🐳</span> 任意 Docker 智能体</div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="section-label">常见问题</div>
+  <h2 class="section-title">FAQ</h2>
+  <div class="faq">
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">Moat 会安装任何东西吗？</div>
+      <div class="faq-a">不会。Moat 只生成配置文件。实际的安装和配置变更由你自己执行，Moat 不会擅自修改任何内容。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">是否支持 Raspberry Pi 4？</div>
+      <div class="faq-a">支持。Raspberry Pi 4（4GB）可使用第 1-3 层和第 6 层。由于 Infisical 推荐 8GB+ 内存，Pi 4 建议跳过第 4 层。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">有哪些依赖？</div>
+      <div class="faq-a">只需 Python 3.8 及以上版本。无需任何外部包（无 pip install）。完全基于 Python 标准库。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">源代码是否公开？</div>
+      <div class="faq-a">是的，以 MIT 许可证在 GitHub 上公开。对于安全软件，我们认为代码可审计非常重要。</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="this.parentElement.classList.toggle('open')">未来会收费吗？</div>
+      <div class="faq-a">核心功能将永久免费。未来计划推出社区威胁情报（自动规则更新）付费方案。核心工具始终免费。</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="cta-block">
+    <h2>2 分钟内完成安全加固</h2>
+    <p>免费。无需账号。无需服务器。<br>只需一个 Python 脚本和浏览器。</p>
+    <div class="hero-actions">
+      <a href="https://github.com/getmoat/moat/releases" class="btn-primary">↓ 在 GitHub 上免费下载</a>
+      <a href="https://github.com/getmoat/moat/issues" class="btn-ghost">提交问题</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-lang">
+    <a href="https://getmoat.work">🌐 English</a> &nbsp;·&nbsp;
+    <a href="https://getmoat.work/ja">🇯🇵 日本語</a>
+  </div>
+  MIT 许可证 · 为自托管 AI 构建者打造
+</footer>
+
+<script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var fw = params.get('for');
+    var variants = {
+      openclaw: {
+        badge: '⚡ 专为 OpenClaw 智能体设计',
+        h1: 'OpenClaw 功能强大。<br>但它<em>安全吗？</em>',
+        sub: 'Moat 自动检测你的 <strong>OpenClaw 环境</strong>，在 2 分钟内生成加固安全配置。无需 YAML 知识。'
+      },
+      langchain: {
+        badge: '⚡ 专为 LangChain 智能体设计',
+        h1: 'LangChain 功能强大。<br>但它<em>安全吗？</em>',
+        sub: 'Moat 自动检测你的 <strong>LangChain 环境</strong>，在 2 分钟内生成加固安全配置。无需 YAML 知识。'
+      },
+      autogen: {
+        badge: '⚡ 专为 AutoGen 智能体设计',
+        h1: 'AutoGen 功能强大。<br>但它<em>安全吗？</em>',
+        sub: 'Moat 自动检测你的 <strong>AutoGen 环境</strong>，在 2 分钟内生成加固安全配置。无需 YAML 知识。'
+      }
+    };
+    if (fw && variants[fw]) {
+      var v = variants[fw];
+      document.getElementById('hero-badge').textContent = v.badge;
+      document.getElementById('hero-h1').innerHTML = v.h1;
+      document.getElementById('hero-sub').innerHTML = v.sub;
+    }
+  })();
+</script>
+</body>
+</html>
