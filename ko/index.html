@@ -100,6 +100,14 @@
     .framework-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:32px; }
     .fw-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 20px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500; }
     .fw-icon { font-size:20px; }
+    .compare-table { width:100%;border-collapse:separate;border-spacing:0;margin-top:40px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;font-size:14px; }
+    .compare-table th { background:var(--surface2);padding:14px 20px;text-align:left;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted); }
+    .compare-table th.highlight { color:var(--accent); }
+    .compare-table td { padding:13px 20px;border-top:1px solid var(--border);color:var(--muted); }
+    .compare-table td:first-child { color:var(--text);font-weight:500; }
+    .compare-table td.highlight { color:var(--text); }
+    .compare-table td.check { color:var(--success);font-size:16px; }
+    .compare-table td.cross { color:var(--border);font-size:16px; }
     .faq { margin-top:40px;display:flex;flex-direction:column;gap:2px; }
     .faq-item { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm); }
     .faq-q { padding:18px 24px;font-size:15px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center; }
@@ -324,6 +332,67 @@
       <p>생성된 설정 파일을 지정 위치에 배치. 동봉된 가이드를 따르세요</p>
     </div>
   </div>
+</section>
+
+<section>
+  <div class="section-label">비교</div>
+  <h2 class="section-title">샌드박스가 아닙니다. 해자입니다.</h2>
+  <p class="section-sub">기존 도구는 에이전트 코드 실행을 샌드박스화하는 데 집중합니다. Moat는 에이전트를 둘러싼 호스트와 네트워크를 강화합니다.</p>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th>기능</th>
+        <th>microsandbox</th>
+        <th>DIY YAML</th>
+        <th class="highlight">Moat</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>코드 실행 샌드박스화</td>
+        <td class="check">✓</td>
+        <td class="cross">—</td>
+        <td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Docker 강화</td>
+        <td class="cross">—</td>
+        <td>⚠️ 수동</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>네트워크 아웃바운드 필터링</td>
+        <td class="cross">—</td>
+        <td>⚠️ 수동</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>시크릿 관리</td>
+        <td class="cross">—</td>
+        <td>⚠️ 수동</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>에이전트 도구 권한 제한</td>
+        <td class="cross">—</td>
+        <td>⚠️ 수동</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>비전문가용 설정 위자드</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="highlight check">✓</td>
+      </tr>
+      <tr>
+        <td>환경 자동 감지</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="highlight check">✓</td>
+      </tr>
+    </tbody>
+  </table>
 </section>
 
 <section id="compat">
