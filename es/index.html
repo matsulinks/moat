@@ -22,8 +22,27 @@
     .nav-links { display:flex;gap:24px;align-items:center;font-size:14px;color:var(--muted); }
     .nav-links a { color:var(--muted); }
     .nav-links a:hover { color:var(--text);text-decoration:none; }
-    .nav-lang { font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 12px;border-radius:999px; }
-    .nav-lang:hover { color:var(--text);text-decoration:none; }
+    .lang-dropdown { position: relative; }
+    .lang-btn {
+      display: flex; align-items: center; gap: 5px;
+      cursor: pointer; color: var(--muted); font-size: 14px;
+      background: none; border: none; padding: 0; font-family: inherit;
+    }
+    .lang-btn:hover { color: var(--text); }
+    .lang-btn::after { content: "▾"; font-size: 11px; }
+    .lang-menu {
+      display: none; position: absolute; top: calc(100% + 8px); right: 0;
+      background: #161b2e; border: 1px solid #2a3050; border-radius: 8px;
+      min-width: 140px; padding: 6px 0; z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+    .lang-dropdown:hover .lang-menu { display: block; }
+    .lang-menu a {
+      display: block; padding: 7px 16px; color: var(--muted) !important;
+      font-size: 13px; text-decoration: none;
+    }
+    .lang-menu a:hover { color: var(--text) !important; background: #1e2540; }
+    .lang-menu a.active { color: var(--accent) !important; }
     .nav-cta { background:var(--accent);color:#0b0f1a !important;font-weight:700;padding:6px 16px;border-radius:var(--radius-sm);font-size:13px; }
     .nav-cta:hover { opacity:0.9;text-decoration:none !important; }
     section { padding:80px 24px;max-width:960px;margin:0 auto; }
@@ -105,9 +124,19 @@
     <a href="#layers">Capas de seguridad</a>
     <a href="#how">Cómo funciona</a>
     <a href="https://github.com/getmoat/moat">GitHub</a>
-    <a href="https://getmoat.work" class="nav-lang">🌐 English</a>
-    <a href="https://getmoat.work/ja" class="nav-lang">🇯🇵 日本語</a>
-    <a href="https://github.com/getmoat/moat/releases" class="nav-cta">Descargar gratis →</a>
+    <div class="lang-dropdown">
+      <button class="lang-btn">🌐 ES</button>
+      <div class="lang-menu">
+        <a href="https://getmoat.work">🇺🇸 English</a>
+        <a href="https://getmoat.work/ja">🇯🇵 日本語</a>
+        <a href="https://getmoat.work/zh">🇨🇳 中文</a>
+        <a href="https://getmoat.work/ko">🇰🇷 한국어</a>
+        <a href="https://getmoat.work/de">🇩🇪 Deutsch</a>
+        <a href="https://getmoat.work/es" class="active">🇪🇸 Español</a>
+        <a href="https://getmoat.work/pt">🇧🇷 Português</a>
+      </div>
+    </div>
+    <a href="https://github.com/matsulinks/moat" class="nav-cta">Descargar gratis →</a>
   </div>
 </nav>
 
