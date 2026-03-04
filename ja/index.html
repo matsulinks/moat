@@ -332,6 +332,12 @@
     }
     .badge-rec { background: rgba(52, 211, 153, 0.15); color: var(--success); }
     .badge-opt { background: rgba(251, 191, 36, 0.15); color: var(--warn); }
+    .layer-divider {
+      text-align: center; font-size: 12px; color: var(--muted);
+      padding: 8px 0; margin: 4px 0;
+      border-top: 1px dashed #2a3050; border-bottom: 1px dashed #2a3050;
+      letter-spacing: 0.05em;
+    }
 
     .steps {
       display: grid;
@@ -597,26 +603,27 @@
     <div class="layer-row">
       <div class="layer-num">4</div>
       <div class="layer-info">
+        <h3>実行時最小権限</h3>
+        <p>ツール呼び出しはデフォルト拒否。エージェントが使えるツールをロール別に明示的に許可</p>
+      </div>
+      <div class="layer-badge badge-rec">✅ 推奨</div>
+    </div>
+    <div class="layer-divider">⚠️ オプション層 — 必要なときに追加</div>
+    <div class="layer-row">
+      <div class="layer-num">5</div>
+      <div class="layer-info">
         <h3>シークレット管理</h3>
         <p>自己ホスト型Infisicalサーバーで .envのAPIキーを安全に管理（RAM 8GB以上推奨）</p>
       </div>
       <div class="layer-badge badge-opt">⚠️ オプション</div>
     </div>
     <div class="layer-row">
-      <div class="layer-num">5</div>
+      <div class="layer-num">6</div>
       <div class="layer-info">
         <h3>スキル・プロンプト防衛</h3>
         <p>危険なスキルカテゴリをブロック。オプションでLLM-as-Judgeによる曖昧リクエスト検査</p>
       </div>
       <div class="layer-badge badge-opt">⚠️ オプション</div>
-    </div>
-    <div class="layer-row">
-      <div class="layer-num">6</div>
-      <div class="layer-info">
-        <h3>実行時最小権限</h3>
-        <p>ツール呼び出しはデフォルト拒否。エージェントが使えるツールをロール別に明示的に許可</p>
-      </div>
-      <div class="layer-badge badge-rec">✅ 推奨</div>
     </div>
     <div class="layer-row">
       <div class="layer-num">7</div>

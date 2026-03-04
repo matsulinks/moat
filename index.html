@@ -301,6 +301,12 @@
       transition: border-color 0.15s;
     }
     .layer-row:hover { border-color: rgba(56, 189, 248, 0.4); }
+    .layer-divider {
+      text-align: center; font-size: 12px; color: var(--muted);
+      padding: 8px 0; margin: 4px 0;
+      border-top: 1px dashed #2a3050; border-bottom: 1px dashed #2a3050;
+      letter-spacing: 0.05em;
+    }
     .layer-num {
       font-size: 20px;
       font-weight: 800;
@@ -585,26 +591,27 @@
     <div class="layer-row">
       <div class="layer-num">4</div>
       <div class="layer-info">
+        <h3>Runtime least-privilege</h3>
+        <p>Default-deny tool permissions. Every tool the agent can call is explicitly allowlisted per role.</p>
+      </div>
+      <div class="layer-badge badge-rec">✅ Recommended</div>
+    </div>
+    <div class="layer-divider">⚠️ Optional layers — add when you need them</div>
+    <div class="layer-row">
+      <div class="layer-num">5</div>
+      <div class="layer-info">
         <h3>Secrets management</h3>
         <p>Self-hosted Infisical server for API keys — no more secrets in .env files</p>
       </div>
       <div class="layer-badge badge-opt">⚠️ Optional</div>
     </div>
     <div class="layer-row">
-      <div class="layer-num">5</div>
+      <div class="layer-num">6</div>
       <div class="layer-info">
         <h3>Skill &amp; prompt defense</h3>
         <p>Block dangerous skill categories. Optional LLM-as-Judge for ambiguous requests.</p>
       </div>
       <div class="layer-badge badge-opt">⚠️ Optional</div>
-    </div>
-    <div class="layer-row">
-      <div class="layer-num">6</div>
-      <div class="layer-info">
-        <h3>Runtime least-privilege</h3>
-        <p>Default-deny tool permissions. Every tool the agent can call is explicitly allowlisted per role.</p>
-      </div>
-      <div class="layer-badge badge-rec">✅ Recommended</div>
     </div>
     <div class="layer-row">
       <div class="layer-num">7</div>

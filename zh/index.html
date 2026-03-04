@@ -92,6 +92,12 @@
     .layer-badge { font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap; }
     .badge-rec { background:rgba(52,211,153,0.15);color:var(--success); }
     .badge-opt { background:rgba(251,191,36,0.15);color:var(--warn); }
+    .layer-divider {
+      text-align: center; font-size: 12px; color: var(--muted);
+      padding: 8px 0; margin: 4px 0;
+      border-top: 1px dashed #2a3050; border-bottom: 1px dashed #2a3050;
+      letter-spacing: 0.05em;
+    }
     .steps { display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:24px;margin-top:40px; }
     .step { background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;position:relative; }
     .step-num { font-size:48px;font-weight:900;color:rgba(56,189,248,0.12);font-family:"SF Mono",monospace;position:absolute;top:12px;right:20px;line-height:1; }
@@ -266,26 +272,27 @@
     <div class="layer-row">
       <div class="layer-num">04</div>
       <div class="layer-info">
+        <h3>运行时最小权限</h3>
+        <p>工具调用默认拒绝。每个角色的可用工具需显式授权</p>
+      </div>
+      <span class="layer-badge badge-rec">✅ 推荐</span>
+    </div>
+    <div class="layer-divider">⚠️ 可选层 — 按需添加</div>
+    <div class="layer-row">
+      <div class="layer-num">05</div>
+      <div class="layer-info">
         <h3>密钥管理</h3>
         <p>自托管 Infisical 服务器，安全管理 .env 中的 API 密钥（建议 8GB+ 内存）</p>
       </div>
       <span class="layer-badge badge-opt">⚠️ 可选</span>
     </div>
     <div class="layer-row">
-      <div class="layer-num">05</div>
+      <div class="layer-num">06</div>
       <div class="layer-info">
         <h3>技能与提示词防御</h3>
         <p>屏蔽危险技能类别，可选 LLM-as-Judge 审查模糊请求</p>
       </div>
       <span class="layer-badge badge-opt">⚠️ 可选</span>
-    </div>
-    <div class="layer-row">
-      <div class="layer-num">06</div>
-      <div class="layer-info">
-        <h3>运行时最小权限</h3>
-        <p>工具调用默认拒绝。每个角色的可用工具需显式授权</p>
-      </div>
-      <span class="layer-badge badge-rec">✅ 推荐</span>
     </div>
     <div class="layer-row">
       <div class="layer-num">07</div>
