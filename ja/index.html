@@ -86,7 +86,8 @@
       min-width: 140px; padding: 6px 0; z-index: 200;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
     }
-    .lang-dropdown:hover .lang-menu { display: block; }
+    .lang-dropdown.open .lang-menu { display: block; }
+    .lang-btn.open::after { content: "▴"; }
     .lang-menu a {
       display: block; padding: 7px 16px; color: var(--muted) !important;
       font-size: 13px; text-decoration: none;
@@ -756,5 +757,24 @@
   }
 </script>
 
+<script>
+(function(){
+  var btn = document.querySelector('.lang-btn');
+  var dropdown = btn && btn.closest('.lang-dropdown');
+  if (!btn || !dropdown) return;
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    dropdown.classList.toggle('open');
+    btn.classList.toggle('open');
+  });
+  document.addEventListener('click', function(){
+    dropdown.classList.remove('open');
+    btn.classList.remove('open');
+  });
+  dropdown.querySelector('.lang-menu').addEventListener('click', function(e){
+    e.stopPropagation();
+  });
+})();
+</script>
 </body>
 </html>
